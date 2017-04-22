@@ -29,17 +29,43 @@ app.get('/joke-view', (req, res, next) => {
 
 });
 
-app.get('/joke-category', (req, res, next) => {
-  res.render('joke-category.ejs');
+app.get('/categories', (req, res, next) => {
+  if (req.query.cat === undefined) {
+    client.getJokeCategories().then((categoriesData) => {
+      console.log('\ngetJokeCategories()');
+      console.log(categoriesData);
 
+      res.render(
+        'joke-categories.ejs',
+        { categories: categoriesData }
+      );
+    });
+  }
+  else {
+    client.getRandomJoke(req.query.cat).then((jokeData) => {
+      console.log(`\ngetRandomJoke(${req.query.cat})`);
+      console.log(jokeData);
+
+      res.render(
+        'joke-category.ejs',
+        {
+          joke: jokeData.value,
+          category: req.query.cat
+        }
+      );
+    });
+  }
 });
 
-app.get('/random-joke-view', (req, res, next) => {
+app.get('/random', (req, res, next) => {
   client.getRandomJoke().then((jokeData) => {
-    console.log('Here is a joke!');
+    // Smart to console log the result, to know the structure.
+    console.log('\ngetRandomJoke()');
     console.log(jokeData);
-  res.render('random-joke-view.ejs', {
-    // joke"key": "val"
+
+  res.render('random-joke-view.ejs',
+    {
+      joke: jokeData.value
     });
   });
 });
